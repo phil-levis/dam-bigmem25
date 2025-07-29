@@ -17,3 +17,106 @@
   year=2022,
   publisher={Automatic Publishing Inc.}
 }
+
+@inproceedings{li25pond,
+author = {Li, Huaicheng and Berger, Daniel S. and Hsu, Lisa and Ernst, Daniel and Zardoshti, Pantea and Novakovic, Stanko and Shah, Monish and Rajadnya, Samir and Lee, Scott and Agarwal, Ishwar and Hill, Mark D. and Fontoura, Marcus and Bianchini, Ricardo},
+title = {Pond: CXL-Based Memory Pooling Systems for Cloud Platforms},
+year = {2023},
+isbn = {9781450399166},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3575693.3578835},
+doi = {10.1145/3575693.3578835},
+abstract = {Public cloud providers seek to meet stringent performance requirements and low hardware cost. A key driver of performance and cost is main memory. Memory pooling promises to improve DRAM utilization and thereby reduce costs. However, pooling is challenging under cloud performance requirements. This paper proposes Pond, the first memory pooling system that both meets cloud performance goals and significantly reduces DRAM cost. Pond builds on the Compute Express Link (CXL) standard for load/store access to pool memory and two key insights. First, our analysis of cloud production traces shows that pooling across 8-16 sockets is enough to achieve most of the benefits. This enables a small-pool design with low access latency. Second, it is possible to create machine learning models that can accurately predict how much local and pool memory to allocate to a virtual machine (VM) to resemble same-NUMA-node memory performance. Our evaluation with 158 workloads shows that Pond reduces DRAM costs by 7\% with performance within 1-5\% of same-NUMA-node VM allocations.},
+booktitle = {Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2},
+pages = {574–587},
+numpages = {14},
+keywords = {CXL, Compute Express Link, cloud computing, datacenter, memory disaggregation, memory pooling},
+location = {Vancouver, BC, Canada},
+series = {ASPLOS 2023}
+}
+
+@article{10.1145/55483.55516,
+author = {Fleisch, B. D.},
+title = {Distributed shared memory in a loosely coupled distributed system},
+year = {1987},
+issue_date = {Oct./Nov. 1987},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {17},
+number = {5},
+issn = {0146-4833},
+url = {https://doi.org/10.1145/55483.55516},
+doi = {10.1145/55483.55516},
+abstract = {This work outlines the development and performance validation of an architecture for distributed shared memory in a loosely coupled distributed computing environment. This distributed shared memory may be used for communication and data exchange between communicants on different computing sites; the mechanism will operate transparently and in a distributed manner. This paper describes the architecture of this mechanism and metrics which will be used to measure its performance. We also discuss a number of issues related to the overall design and what research contribution such an implementation can provide to the computer science field.},
+journal = {SIGCOMM Comput. Commun. Rev.},
+month = aug,
+pages = {317–327},
+numpages = {11}
+}
+
+@inproceedings{fleisch87dsm,
+author = {Fleisch, B. D.},
+title = {Distributed shared memory in a loosely coupled distributed system},
+year = {1987},
+isbn = {0897912454},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/55482.55516},
+doi = {10.1145/55482.55516},
+abstract = {This work outlines the development and performance validation of an architecture for distributed shared memory in a loosely coupled distributed computing environment. This distributed shared memory may be used for communication and data exchange between communicants on different computing sites; the mechanism will operate transparently and in a distributed manner. This paper describes the architecture of this mechanism and metrics which will be used to measure its performance. We also discuss a number of issues related to the overall design and what research contribution such an implementation can provide to the computer science field.},
+booktitle = {Proceedings of the ACM Workshop on Frontiers in Computer Communications Technology},
+pages = {317–327},
+numpages = {11},
+location = {Stowe, Vermont, USA},
+series = {SIGCOMM '87}
+}
+
+
+@article{keleher92release,
+author = {Keleher, Pete and Cox, Alan L. and Zwaenepoel, Willy},
+title = {Lazy release consistency for software distributed shared memory},
+year = {1992},
+issue_date = {May 1992},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {20},
+number = {2},
+issn = {0163-5964},
+url = {https://doi.org/10.1145/146628.139676},
+doi = {10.1145/146628.139676},
+abstract = {Relaxed memory consistency models, such as release consistency, were introduced in order to reduce the impact of remote memory access latency in both software and hardware distributed shared memory (DSM). However, in a software DSM, it is also important to reduce the number of messages and the amount of data exchanged for remote memory access. Lazy release consistency is a new algorithm for implementing release consistency that lazily pulls modifications across the interconnect only when necessary. Trace-driven simulation using the SPLASH benchmarks indicates that lazy release consistency reduces both the number of messages and the amount of data transferred between processors. These reductions are especially significant for programs that exhibit false sharing and make extensive use of locks.},
+journal = {SIGARCH Comput. Archit. News},
+month = apr,
+pages = {13–21},
+numpages = {9}
+}
+
+
+@ARTICLE{ho01wires,
+  author={Ho, R. and Mai, K.W. and Horowitz, M.A.},
+  journal={Proceedings of the IEEE}, 
+  title={The future of wires}, 
+  year={2001},
+  volume={89},
+  number={4},
+  pages={490-504},
+  keywords={Delay;Wires;Wiring;Design automation;Integrated circuit interconnections;Integrated circuit technology;Paper technology;Hip;Global communication;Repeaters},
+  doi={10.1109/5.920580}}
+
+@inproceedings{patel_xfm_2023,
+  address = {Toronto, ON, Canada},
+  author = {Patel, Neel and Mamandipoor, Amin and Quinn, Derrick and Alian, Mohammad},
+  booktitle = {Proceedings of the 56th {Annual} {IEEE}/{ACM} {International} {Symposium} on {Microarchitecture}},
+  doi = {10.1145/3613424.3623776},
+  isbn = {979-8-4007-0329-4},
+  month = dec,
+  pages = {769--783},
+  publisher = {Association for Computing Machinery},
+  series = {{MICRO} '23},
+  shorttitle = {{XFM}},
+  title = {{XFM}: {Accelerated} {Software}-{Defined} {Far} {Memory}},
+  url = {https://dl.acm.org/doi/10.1145/3613424.3623776},
+  urldate = {2025-07-15},
+  year = 2023,
+}
