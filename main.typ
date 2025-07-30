@@ -65,8 +65,8 @@
 
 #show: acmart.with(
   title: title,
-  authors: authors,
-  affiliations: affiliations,
+  authors: (), //authors,
+  affiliations: (),// affiliations,
   conference: conference,
   doi: doi,
   copyright: "cc",
@@ -77,7 +77,7 @@
 
 = Abstract
 
-Memory latency, bandwidth, capacity, and energy increasingly limit performance. In this paper, we consider future system architectures that consist of huge (many-terabyte to petabyte scale) memories shared among large numbers of CPUs. We argue two practical engineering challenges, device scaling and signaling, limit the utility of such designs.
+Memory latency, bandwidth, capacity, and energy increasingly limit performance. In this paper, we consider proposed system architectures that consist of huge (many-terabyte to petabyte scale) memories shared among large numbers of CPUs. We argue two practical engineering challenges, device scaling and signaling, limit the utility of such designs.
 //Limits in transistor and memory manufacturing mean memory increasingly dominate system cost. 
 //, such that huge memories will be cost-effective only for very specialized applications.
 //Furthermore, even for those applications, limits on the scaling of signalling speeds will make it difficult for memory pools to  keep up with the applications' bandwidth requirements. 
@@ -88,7 +88,7 @@ Memory latency, bandwidth, capacity, and energy increasingly limit performance. 
 // To address these challenges, many papers have proposed decoupling memory from compute elements, allowing many CPUs to share large, disaggregated pools of memory.
 
 We propose the opposite approach. Rather than create large,  shared, homogenous memories, systems should
-explicitly break memory up into smaller slices more tightly coupled with compute at a finer granularity. 
+explicitly break memory up into smaller slices more tightly coupled with compute at a finer granularity, leveraging advances in 2.5D/3D integration to prioritize memory, rather than compute, utilization. 
 Each compute node provisions "enough" local memory, enabling micrometer-scale data movement and dramatically
 reducing access cost. By making memory sizes and distances explicit, software can efficiently manage 
 data placement and movement.
@@ -106,11 +106,11 @@ grow beyond a single host while leaving the complexities of
 caching, consistency, and placement to lower system layers.
 In the 1980s and 1990s, this idea was explored as distributed shared memory 
 (DSM)@keleher92release, informing  memory consistency models in
-modern multicore and multiprocessor systems.
+modern multi-core and multiprocessor systems.
 
 //Memory disaggregation is gaining traction as a way to reduce memory costs and improve utilization in datacenter-scale systems@li25pond. The conventional model pools memory into a shared remote tier---typically accessed over interconnects like CXL---so that compute nodes can allocate more capacity on demand. Pooling promises to reduce stranded memory and enable flexible provisioning across diverse workloads. 
 
-As memory is increasingly the bottleneck in datacenter and cloud servers, research is revisiting
+As memory is increasingly the bottleneck in data center and cloud servers, research is revisiting
 these ideas to enable a next generation of systems with huge network-attached memories that are pooled, i.e., shared, across many 
 processors. This paper argues that this approach is untenable due to two modern engineering 
 barriers: device scaling and signaling.
@@ -125,15 +125,13 @@ architecturally undesirable to provision large memories. Instead, we should work
 
 // there are 3D DRAM on the horizon that all memory companies are working on, but they won't be available in 5 years. So we are still technically correct. - Philip
 
-The second barrier, _signaling_, dictates that the energy efficiency and bandwidth of memory 
-improve with tighter integration with computational logic.@ho01wires An 
-SRAM cache line across a chip is slower and higher energy
-than a nearby one, while one on another chiplet is more expensive still.#footnote([Modern server processors are made up of multiple, separately manufactured _chiplets_ that are packaged together into
+The second barrier, _signaling_, has to do with the energy required to move signals between components at a given bandwidth. It dictates that the energy efficiency and bandwidth to/from memory 
+improve with tighter integration with computational logic.@ho01wires Within a chiplet, access to an SRAM cache line that is far away is slower and/or requires higher energy than a nearby one -- while access to one on another chiplet is more expensive still.#footnote([Modern server processors are made up of multiple, separately manufactured _chiplets_ that are packaged together into
 a larger system.]) Going to DRAM across traces on a circuit board is an order of magnitude more
 expensive; CXL or RDMA to remote memory add even more overheads. These penalties make remote memory
 prohibitively expensive.
 
-Faced with these barriers, we propose a different approach: physically composable disaggregation. Instead of pulling memory away from compute, we build systems from tightly integrated compute-memory nodes using advances in packaging technology. When application needs more memory than a single node can provide, we scale across multiple such nodes accessing peer memory over lightweight, memory-semantic interconnects. 
+Faced with these barriers, we propose a different approach: physically composable disaggregation. Instead of pulling memory away from compute, we build systems from tightly integrated compute-memory nodes using advances in packaging technology.  These memories can be provisioned flexibly, supporting multiple modes---for example, as a transparent cache or as explicit NUMA domains under software control. When an application needs more memory than a single node can provide, we scale across multiple such nodes accessing peer memory over lightweight, memory-semantic interconnects. 
 
 //== Paper overview
 //The rest of the paper is organized as follows: 
@@ -153,16 +151,14 @@ Faced with these barriers, we propose a different approach: physically composabl
 // not going up, which means that they won't become cheaper. As logic shrinks, memory
 // will increasingly dominate costs, which means you won't want more of it. xxx
 
-For decades, two-dimensional (2D) device technology scaling simultaneously enabled 
-higher memory density and capacity at reduced cost. However, @scaling shows how traditional 2D 
-device scaling for  both SRAM and DRAM have saturated. The cost per byte of DRAM has been
+Two-dimensional (2D) semiconductor scaling  enabled higher memory density and capacity at reduced cost. However, @scaling shows how traditional 2D scaling of both SRAM and DRAM has ended. The cost per byte of DRAM has been
 flat for over a decade, which is why as servers have scaled up, DRAM has come to dominate
 system cost.#cite(<patel_xfm_2023>)
 
 For SRAM, the primary constraint stems from physical limitations as transistor dimensions approach atomic
-scales: manufacturing tolerances limits transistor matching of the cross-coupled inverter pair, reducing signal margin.
+scales: manufacturing tolerances limit transistor matching of the cross-coupled inverter pair, reducing signal margin.
 Computational logic does not suffer
-from this issue as digital signal restoration provides better noise immunity than memory's mixed signal designs. 
+from this issue. Digital signal restoration also provides better noise immunity than memory's mixed signal designs. 
 For DRAM, the primary constraint is the cost of etching the high aspect-ratio capacitors and the complex transistor geometry that guarantees low leakage. More advanced nodes decrease
 the physical size of DRAM cells, but not the per-transistor cost. We can continue to make
 larger DRAM DIMMs, but their per-byte cost does not decrease.#footnote([3D DRAM promises to improve bit density but the cost of manufacturing is still unknown.])
@@ -171,7 +167,7 @@ The primary takeaway from these limits is that enormous memories will be enormou
 On-chip caches will not grow faster than chip area, and modern server processors are already huge (AMD SP5 is 5,428mm#super("2")). 
 Systems will have to use memory more efficiently.
 
-= Locality is Efficiency (Remote Costs You)
+= Locality = Efficiency AND Performance
 
 #figure(
   // box(
@@ -201,12 +197,12 @@ Systems will have to use memory more efficiently.
   table(columns: 4,
   inset: 2pt,
   table.header(
-    [*Integration*], [*Pitch*], [*Energy/bit*], [*Bandwidth*] 
+    [*Integration*], [*Pitch*], [*Energy/bit*], [*BW/chip*]//,[*Pin Rate*] 
   ),
-  [On-die (5 nm node)], [28 nm],   [5 fJ/bit], [131 TB/s],
-  [3D die stack],     [2$mu$m],  [50 fJ/bit], [6.56 TB/s],
-  [2.5D integration],   [0.35 mm],  [2 pJ/bit], [1.2 TB/s],
-  [Discrete package],          [0.81 mm], [10 pJ/bit], [3.125 GB/s]),
+  [On-die (5nm) (e.g. SRAM)], [28 nm],   [5 fJ], [131 TB/s], //[2 Gbps ],
+  [Hybrid bonding],     [9 $mu$m],  [50 fJ], [6.56 TB/s], //[8 Gbps],
+  [Microbump (e.g. HBM)],   [36 $mu$m],  [2 pJ], [2 TB/s],// [8 Gbps],
+  [C4 solder bump (e.g. DDR)],  [0.73 mm], [10 pJ], [128 GB/s]),// [32 Gbps]), 
   placement: auto,
   caption: [Four major integration methods: tighter integration has lower energy and higher bandwidth communication.],
 ) <pitch>
@@ -228,19 +224,18 @@ Caches exemplify this principle: L1, L2, and L3 caches all use the same SRAM tec
 but L1 caches achieve superior performance through smaller memory bank sizes, finer-grained access, 
 and closer physical proximity to CPU cores. 
 
-DRAM bandwidth to a processor socket has been slowly 
-improving: a modern DDR5-5600 DIMM is 358Gbps, and the
-DIMMs per socket grew from 8 to 12, for an aggregate bandwidth of 4.3Tbps. At the same time,
-however, the number of cores per socket has grown, exceeding or matching bandwidth improvements. @bandwidth shows the per-core bandwidth for Intel and AMD server processor packages since 2018: it has been stagnant.
+DRAM bandwidth to a processor socket has been slowly improving: a modern DDR5-5600 DIMM is 358Gbps, and the DIMMs per socket grew from 8 to 12, for an aggregate bandwidth of 4.3Tbps. At the same time, however, the number of cores per socket has grown, exceeding or matching bandwidth improvements. @bandwidth shows the per-core bandwidth for Intel and AMD server processor packages since 2018: it has been stagnant.
 
 DRAM's performance //by performance, you mean bandwidth or latency? can this be more specific?
 limits and energy costs stem from being connected over copper traces on a 
 printed circuit board (PCB). These traces have a minimum width and so there is limited interconnect density 
-(e.g. DDR5 uses only 288 pins). High-bandwidth Memory (HBM) achieves higher bandwidth by repurposing DDR
+(e.g. DDR5 uses only 288 pins). High-bandwidth Memory (HBM) achieves higher bandwidth by repurposing DRAM dies //DR
 and improving the integration technology. By using an in-package silicon logic base die tucked underneath several DRAM chips, connected by through-silicon-vias, each HBM3E stack has 1024 pins. This stark difference in pin count directly translates to HBM's bandwidth advantage.
 
-@pitch shows how tighter physical integration allows denser pins and higher bandwidth.  While current state-of-the-art copper hybrid bonding in 3D stacking has pitches as small as 
-2μm [ref], this remains >80 times larger than the 5nm node's 28nm. This enormous gap in pin density necessitates higher-speed signaling circuits, increasing energy consumption. The energy
+@pitch shows how tighter physical integration allows denser pins and higher bandwidth.  
+//While current state-of-the-art copper hybrid bonding in 3D stacking has pitches as small as 
+//2μm [ref], this remains >70 times larger than the 5nm node's 28nm. 
+Lower pin densities necessitate higher-speed signaling circuits, increasing energy consumption. The energy
 implications are profound. Research consistently demonstrates that data movement to/from the compute chip consumes 
 approximately 70% of total memory system energy, while the DRAM cells themselves account for only
 10-15% [ref]. The tradeoff is that tighter integration is limited by module size.#footnote("E.g., one literally cannot fit terabytes of DRAM inside a chip package, which is why HBM capacity is limited.")
@@ -255,9 +250,15 @@ approximately 70% of total memory system energy, while the DRAM cells themselves
 // #linebreak()
 
 
-These scaling challenges necessitate a fundamental rethinking of memory hierarchy design -- we must transition from a focus on raw capacity to emphasizing bandwidth and energy-efficiency. We revisit memory "disaggregation" from a new angle: instead of pooling memory in one remote location accessed via a hierarchy of packaging and interconnects, we break up larger memories into multiple smaller units, much closer to computation units ---effectively _distributed local memories_. 
+These scaling challenges necessitate a fundamental rethinking of memory hierarchy design -- we must transition from a focus on raw capacity to emphasizing bandwidth and energy-efficiency. We revisit memory "disaggregation" from a new angle: instead of pooling memory in one remote location accessed via a hierarchy of packaging and interconnects, we break up larger memories into multiple smaller units, much closer to computation units. // ---effectively _distributed local memories_. 
 
-We propose flipping the script by emphasizing finer-grained integration of memory and compute at architectural and physical levels and through an increased emphasis on memory utilization --- even if it sometimes comes as some modest decrease in compute utilization. It is enabled by advanced 2.5D and 3D integration technologies that co-package or vertically stack memory with compute with dense interconnects. As a result, memory accesses occur over micrometer-scale distances using dense interconnects such as micro-bumps, hybrid bonds, through-silicon vias or monolithic integration on the wafer itself, dramatically reducing the latency, energy, and bandwidth bottlenecks inherent to transparent, large address spaces.
+// We propose flipping the script by emphasizing finer-grained integration of memory and compute at architectural and physical levels and through an increased emphasis on memory utilization --- even if it sometimes comes at some modest decrease in compute utilization. It is enabled by advanced 2.5D and 3D integration technologies that co-package or vertically stack memory with compute with dense interconnects. As a result, memory accesses occur over micrometer-scale distances using dense interconnects such as micro-bumps, hybrid bonds, through-silicon vias and/or monolithic integration on the wafer itself, dramatically reducing the latency, energy, and bandwidth bottlenecks inherent to transparent, large address spaces.
+
+
+We propose flipping the script by emphasizing finer-grained integration of memory and compute at architectural and physical levels and through an increased emphasis on memory utilization---even if it sometimes comes at some modest decrease in compute utilization. Enabled by advanced 2.5D/3D integration, we co-package or vertically stack memory with compute using dense interconnects. Each compute-memory node functions as a sub-NUMA domain collapsed onto the package: like modern processors favoring local DDR5s, each node provides its own local slice of memory. Local accesses span micrometer-scale distances via micro-bumps, hybrid bonds, through-silicon vias and/or monolithic inter-layer vias, while overflow accesses to peer nodes resemble a remote-NUMA hop, but at tens of instead of hundreds of nanoseconds. Multiplying these micro-NUMA domains preserves familiar locality semantics while dramatically reducing the latency, energy, and bandwidth bottlenecks inherent to transparent, large address spaces.
+
+// divides its DDR5 DIMMs into left-and right-hand domains, favoring accesses to the local side and paying a premium for accesses to the far side, this approach gives each module its own "local" slice of integrated memory. Intra-module accesses now travel only micrometers-scale through dense micro-bumps, hybrid bonds, through-silicon vias and/or monolithic inter-layer vias, while overflow traffic to a peer module resembles a remote-NUMA hop, but at tens rather than hundreds of nanoseconds. By multiplying these micro-NUMA domains and shrinking the distance between them, we preserve familair localityt semantics while dramatically reducing the latency, energy, band bandwidth bottlenecks inherent to transparent, large address spaces. 
+
 
 /*
 = Application Architectures
