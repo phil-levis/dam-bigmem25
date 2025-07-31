@@ -77,18 +77,12 @@ series = {SIGCOMM '87}
 author = {Keleher, Pete and Cox, Alan L. and Zwaenepoel, Willy},
 title = {Lazy release consistency for software distributed shared memory},
 year = {1992},
-issue_date = {May 1992},
 publisher = {Association for Computing Machinery},
 address = {New York, NY, USA},
-volume = {20},
-number = {2},
+
 issn = {0163-5964},
-url = {https://doi.org/10.1145/146628.139676},
-doi = {10.1145/146628.139676},
 abstract = {Relaxed memory consistency models, such as release consistency, were introduced in order to reduce the impact of remote memory access latency in both software and hardware distributed shared memory (DSM). However, in a software DSM, it is also important to reduce the number of messages and the amount of data exchanged for remote memory access. Lazy release consistency is a new algorithm for implementing release consistency that lazily pulls modifications across the interconnect only when necessary. Trace-driven simulation using the SPLASH benchmarks indicates that lazy release consistency reduces both the number of messages and the amount of data transferred between processors. These reductions are especially significant for programs that exhibit false sharing and make extensive use of locks.},
 journal = {SIGARCH Comput. Archit. News},
-month = apr,
-pages = {13–21},
 numpages = {9}
 }
 
@@ -105,18 +99,31 @@ numpages = {9}
   doi={10.1109/5.920580}}
 
 @inproceedings{patel_xfm_2023,
-  address = {Toronto, ON, Canada},
   author = {Patel, Neel and Mamandipoor, Amin and Quinn, Derrick and Alian, Mohammad},
-  booktitle = {Proceedings of the 56th {Annual} {IEEE}/{ACM} {International} {Symposium} on {Microarchitecture}},
-  doi = {10.1145/3613424.3623776},
   isbn = {979-8-4007-0329-4},
-  month = dec,
-  pages = {769--783},
-  publisher = {Association for Computing Machinery},
   series = {{MICRO} '23},
   shorttitle = {{XFM}},
   title = {{XFM}: {Accelerated} {Software}-{Defined} {Far} {Memory}},
-  url = {https://dl.acm.org/doi/10.1145/3613424.3623776},
   urldate = {2025-07-15},
   year = 2023,
+}
+
+@article{SRAMN5,
+  title={A 5-nm 135-mb SRAM in EUV and high-mobility channel FinFET technology with metal coupling and charge-sharing write-assist circuitry schemes for high-density and low-V MIN applications},
+  author={Chang, Tsung-Yung Jonathan and Chen, Yen-Huei and Chan, Wei-Min and Cheng, Hank and Wang, Po-Sheng and Lin, Yangsyu and Fujiwara, Hidehiro and Lee, Robin and Liao, Hung-Jen and Wang, Ping-Wei and others},
+  journal={IEEE Journal of Solid-State Circuits},
+  volume={56},
+  number={1},
+  pages={179--187},
+  year={2020},
+  publisher={IEEE}
+}
+
+@inproceedings{Vcache,
+  title={3D V-Cache: the Implementation of a Hybrid-Bonded 64MB Stacked Cache for a 7nm x86-64 CPU},
+  author={Wuu, John and Agarwal, Rahul and Ciraula, Michael and Dietz, Carl and Johnson, Brett and Johnson, Dave and Schreiber, Russell and Swaminathan, Raja and Walker, Will and Naffziger, Samuel},
+  booktitle={Proceedings of ISSCC},
+  volume={65},
+  year={2022},
+  organization={IEEE}
 }
