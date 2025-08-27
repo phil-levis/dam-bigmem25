@@ -16,6 +16,7 @@
   (
     name: [Shuhan Liu#stanford, 
            Samuel Dayo#stanford, 
+           Peijing Li#stanford,
            Philip Levis#stanford, 
            Subhasish Mitra#stanford, \  
            Thierry Tambe#stanford,
@@ -88,9 +89,9 @@ Memory latency, bandwidth, capacity, and energy increasingly limit performance. 
 // To address these challenges, many papers have proposed decoupling memory from compute elements, allowing many CPUs to share large, disaggregated pools of memory.
 
 We propose the opposite approach. Rather than create large,  shared, homogenous memories, systems 
-explicitly break memory up into smaller slices more tightly coupled with compute elements. Leveraging advances in 2.5D/3D integration, this compute-memory node provisions private
+explicitly break memory up into smaller slices more tightly coupled with compute elements. Leveraging advances in monolithic/2.5D/3D integration, this compute-memory node provisions private
 local memory, enabling accesses of node-exclusive data through micrometer-scale distances, and dramatically
-reduced access cost. In-package memory elements support shared state within a processor, providing far better bandwidth and energy-efficiency than DRAM, which is used as main memory for large working sets and cold data. Hardware's making memory capacities and distances explicit allows software to efficiently compose this hierarchy, managing 
+reduced access cost. In-package memory elements support shared state within a processor, providing far better bandwidth and energy-efficiency than off-package DRAM, which is used as main memory for large working sets and cold data. Hardware's making memory capacities and distances explicit allows software to efficiently compose this hierarchy, managing 
 data placement and movement. 
 
 // need to include that we still have shared memory (eg., on-package HBM and DIMMs; local 3D integrated memories provide each chiplet with expanded capacity with lower latency ...)
@@ -167,8 +168,8 @@ For SRAM, the primary constraint stems from transistor dimensions approaching at
 Computational logic does not suffer
 from this issue as each stage restores the digital signal. 
 For DRAM, the primary constraint is the cost of etching the high aspect-ratio capacitors and the complex transistor geometry that guarantees low leakage. More advanced nodes decrease
-the physical size of DRAM cells, but not the per-transistor cost. We can continue to make
-larger DRAM DIMMs, but their per-byte cost does not decrease.#footnote([3D DRAM promises to improve bit density but the cost of manufacturing is still unknown.])
+the physical size of DRAM cells, but not the per-memory-cell cost. We can continue to make
+larger DRAM DIMMs, but their per-byte cost does not decrease.#footnote([3D DRAM promises to improve bit density but its cost is unknown.])
 
 The primary takeaway from these limits is that enormous memories will be enormously expensive.
 On-chip caches will not grow faster than chip area, and modern server processors are already huge (AMD SP5 is 5,428mm#super("2")). 
@@ -239,7 +240,7 @@ printed circuit board (PCB), which has limited number of copper traces and bump 
 (e.g. 288 pins for DDR5). High-bandwidth Memory (HBM) repurposes DRAM dies //DR
 and moves them closer with improved integration technology. By using an in-package silicon logic base die tucked underneath several DRAM dies, connected by through-silicon-vias, each HBM3E stack has 1024 pins and shorter interconnect distance. This stark difference in pin count directly translates to HBM's bandwidth advantage. @pitch shows how tighter physical integration allows denser pins, higher bandwidth, and lower energy. Lower pin densities necessitate higher-speed signaling circuits, increasing energy consumption.
 
-These integration limits mean that cores will not see performance improvements from DRAM. Packages cannot accommodate additional DIMMs, and their pin counts are already at their practical limits. Higher signaling speeds across  copper traces has a high energy cost. 
+These integration limits mean that cores will not see performance improvements from DRAM. Circuit boards cannot accommodate additional DIMMs, and their pin counts are already at their practical limits. Higher signaling speeds across  copper traces has a high energy cost. 
 
 
 //TODO: Replace with primary takeaway of section 3. Basically, we can't have more DIMMs because of the space and they can't get much faster.
@@ -271,7 +272,7 @@ These scaling challenges necessitate a fundamental rethinking of memory hierarch
 // We propose flipping the script by emphasizing finer-grained integration of memory and compute at architectural and physical levels and through an increased emphasis on memory utilization --- even if it sometimes comes at some modest decrease in compute utilization. It is enabled by advanced 2.5D and 3D integration technologies that co-package or vertically stack memory with compute with dense interconnects. As a result, memory accesses occur over micrometer-scale distances using dense interconnects such as micro-bumps, hybrid bonds, through-silicon vias and/or monolithic integration on the wafer itself, dramatically reducing the latency, energy, and bandwidth bottlenecks inherent to transparent, large address spaces.
 
 
-We propose flipping the script on memory "disaggregation" by emphasizing finer-grained integration of memory and compute with /*at architectural and physical levels and through an*/ increased emphasis on memory utilization---even if it sometimes comes at some modest decrease in compute utilization. At the center of this approach is the compute-memory node, which uses 3D integration technologies to integrate compute with a local memory, stacking memory on top of compute similar to AMD's VCache design and Milan-X processors.@Vcache
+We propose flipping the script on memory "disaggregation" by emphasizing finer-grained integration of memory and compute with /*at architectural and physical levels and through an*/ increased emphasis on memory utilization---even if it sometimes comes at some modest decrease in compute utilization. At the center of this approach is the compute-memory node, which uses 3D integration technologies to integrate compute with a local memory, stacking memory on top of compute exemplified by AMD's VCache design and Milan-X processors.@Vcache
 
 Unlike a cache, however, this private local memory is explicitly managed and the exclusive home for node-specific data such as execution stacks and other thread-private state. Accesses over micrometer-scale distances via micro-bumps, hybrid bonds, through-silicon vias, or monolithic wafer-level interconnects, dramatically reduce the latency, energy, and bandwidth bottlenecks of large address spaces. Mirroring practises in modern multi-chiplet processors, shared state that must span nodes--such as locks---is placed in on-package shared memory (e.g., HBM), which, while slower than private local slices, still deliver far better bandwidth and energy-efficiency than off-package DRAM.  
 
@@ -280,7 +281,7 @@ Unlike a cache, however, this private local memory is explicitly managed and the
 
 // Enabled by advanced 2.5D/3D integration, we co-package or vertically stack memory with compute using dense interconnects. Each compute-memory node functions as a sub-NUMA domain collapsed onto the package: like modern processors favoring local DDR5s, each node provides its own local slice of memory. Local accesses span micrometer-scale distances via micro-bumps, hybrid bonds, through-silicon vias and/or monolithic inter-layer vias, while overflow accesses to peer nodes resemble a remote-NUMA hop, but at tens of instead of hundreds of nanoseconds. Multiplying these micro-NUMA domains preserves familiar locality semantics while dramatically reducing the latency, energy, and bandwidth bottlenecks inherent to transparent, large address spaces.
 
-However, integration is limited by physical constraints (e.g. thermal dissipation, module size, etc.)#footnote("E.g., one literally cannot fit terabytes of DRAM inside a chip package."). Large memories will continue to require off-package DRAM.  Instead of serving as a pooled, flat, shared address space, DRAM becomes a bulk, capacity-driven storage tier for large working sets and cold data, while performance-critical accesses are managed using the faster disaggregated on-package memories. Software _composes_ the memory system itself---deciding what data remains local, what is shared, and what is relegated to off-package DRAM---making data placement and movement explicit through abstractions that expose near-zero distance local memory alongside higher-latency shared tiers in a way that enables efficient composition. 
+However, integration is limited by physical constraints (e.g. thermal dissipation, module size, etc.)#footnote("E.g., one literally cannot fit terabytes of DRAM inside a chip package."). Large memories will continue to require off-package DRAM.  Instead of serving as a pooled, flat, shared address space, DRAM becomes a bulk, capacity-driven memory tier for large working sets and cold data, while performance-critical accesses are managed using the faster disaggregated on-package memories. Software _composes_ the memory system itself---deciding what data remains local, what is shared, and what is relegated to off-package DRAM---making data placement and movement explicit through abstractions that expose near-zero distance local memory alongside higher-latency shared tiers in a way that enables efficient composition. 
 
 
 //nodes access local data in local memory with dense interconnect enabled by levaraging advanced 2.5D/3D intergation. Data shared by multiple node is accessed by 
